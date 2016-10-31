@@ -16,5 +16,32 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hello World!" />
+        android:text="Connected to: "
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
+        android:id="@+id/connectLabel" />
+
+    <TextView
+        android:text="Address: "
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/connectLabel"
+        android:layout_alignParentStart="true"
+        android:id="@+id/addressLabel" />
+
+    <TextView
+        android:text="Not found D:"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/connectLabel"
+        android:layout_toEndOf="@+id/addressLabel"
+        android:id="@+id/deviceAddress" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/deviceName"
+        android:text="None :("
+        android:layout_alignParentTop="true"
+        android:layout_toEndOf="@+id/connectLabel" />
 </RelativeLayout>

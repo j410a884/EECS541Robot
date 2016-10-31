@@ -25,7 +25,7 @@ import java.util.Set;
 import java.util.UUID;
 
 public class BluetoothActivity extends AppCompatActivity {
-    private static final UUID MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb");
+
     private BluetoothAdapter mBluetoothAdapter;
     ArrayAdapter<String> mArrayAdapter;
     private Set<BluetoothDevice> pd;
@@ -65,17 +65,17 @@ public class BluetoothActivity extends AppCompatActivity {
             @Override
             public void onItemClick( final AdapterView<?> parent, final View view, final int position, long id )
             {
-                new AlertDialog.Builder( getApplicationContext() ).setTitle( "Confirm" ).setMessage("Use this device?")
+                new AlertDialog.Builder( BluetoothActivity.this ).setTitle( "Confirm" ).setMessage("Use this device?")
                         .setPositiveButton( "Yes", new DialogInterface.OnClickListener()
                         {
 
                             public void onClick(DialogInterface dialog, int button )
                             {
                                 String[] str = parent.getItemAtPosition( position ).toString().split("\n");
-                                String s = str[1];
                                 Intent i = new Intent( getApplicationContext(), MainActivity.class );
-                                i.putExtra("addr", s);
-                                setResult( 1, i );
+                                i.putExtra("addr", str[1]);
+                                i.putExtra("name", str[0]);
+                                setResult( RESULT_OK, i );
                                 finish();
                             }
                         })
