@@ -38,6 +38,9 @@ public class MainActivity extends AppCompatActivity {
     private ConnectedThread mConnectedThread;
     private BluetoothAdapter mBluetoothAdapter;
     private BluetoothDevice mRobot;
+    int MESSAGE_READ = 987;
+
+    private Handler mAcceptHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,20 +48,29 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        Intent bt = new Intent( getApplicationContext(), BluetoothActivity.class );
-        startActivityForResult( bt, GET_BT_CONFIG );
+        //Intent bt = new Intent( getApplicationContext(), BluetoothActivity.class );
+        //startActivityForResult( bt, GET_BT_CONFIG );
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+
 
         TextView tv = (TextView)findViewById( R.id.connectLabel );
         tv.setText( "NOT CONNECTED :(" );
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+
+        mAcceptHandler = new Handler()
+        {
+            public void handleMessage( Message msg )
+            {
+                if( msg.what == MESSAGE_READ)
+                {
+                    TextView readData = (TextView)findViewById( R.id.read );
+                    readData.setText( msg.toString() );
+                }
             }
-        });
+        };
+
+        mAcceptThread = new AcceptThread();
+        mAcceptThread.start();
+
     }
 
     @Override
@@ -90,10 +102,10 @@ public class MainActivity extends AppCompatActivity {
             if(resultCode == RESULT_OK)
             {
                 mRobot = mBluetoothAdapter.getRemoteDevice( data.getStringExtra("addr") );
-                //mConnectThread = new ConnectThread( mRobot );
-                //mConnectThread.start();
-                mAcceptThread = new AcceptThread();
-                mAcceptThread.start();
+               // mConnectThread = new ConnectThread( mRobot );
+               // mConnectThread.start();
+                //mAcceptThread = new AcceptThread();
+                //mAcceptThread.start();
             }
         }
     }
@@ -143,7 +155,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    /*private class ConnectThread extends Thread {
+ /*   private class ConnectThread extends Thread {
         private final BluetoothSocket mmSocket;
         private final BluetoothDevice mmDevice;
 
@@ -183,8 +195,8 @@ public class MainActivity extends AppCompatActivity {
             mConnectedThread.start();
         }
 
-        /** Will cancel an in-progress connection, and close the socket */
-        /*public void cancel() {
+        // Will cancel an in-progress connection, and close the socket
+        public void cancel() {
             try {
                 mmSocket.close();
             } catch (IOException e) { }
@@ -208,11 +220,11 @@ public class MainActivity extends AppCompatActivity {
             }
         };
     }*/
+
     private class ConnectedThread extends Thread {
         private final BluetoothSocket mmSocket;
         private final InputStream mmInStream;
         private final OutputStream mmOutStream;
-        int MESSAGE_READ = 987;
 
         public ConnectedThread(BluetoothSocket socket) {
             mmSocket = socket;
@@ -241,7 +253,7 @@ public class MainActivity extends AppCompatActivity {
                         // Read from the InputStream
                         bytes = mmInStream.read(buffer);
                         // Send the obtained bytes to the UI activity
-                        mHandler.obtainMessage(MESSAGE_READ, bytes, -1, buffer)
+                        mAcceptHandler.obtainMessage(MESSAGE_READ, bytes, -1, buffer)
                                 .sendToTarget();
                     } catch (IOException e) {
                         break;
@@ -265,16 +277,6 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        private final Handler mHandler = new Handler()
-        {
-            public void handleMessage( Message msg )
-            {
-                if( msg.what == CONNECTION_STARTED )
-                {
-                    TextView readData = (TextView)findViewById( R.id.read );
-                    readData.setText( msg.toString() );
-                }
-            }
-        };
+
     }
 }
