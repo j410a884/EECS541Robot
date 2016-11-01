@@ -12,9 +12,11 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.view.DragEvent;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -43,7 +45,8 @@ public class MainActivity extends Activity {
   //  int MESSAGE_READ = 987;
     boolean mConnected = false;
     private ImageView mLeftControl;
-    private enum { FORWARD; LEFT; RIGHT; BACKWARD; }
+    boolean mMoving = false;
+
 
     private Handler mAcceptHandler;
 
@@ -56,13 +59,81 @@ public class MainActivity extends Activity {
         startActivityForResult( bt, GET_BT_CONFIG );
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
-        ImageView leftBG = (ImageView)findViewById( R.id.leftBound );
-        mLeftControl = (ImageView)findViewById( R.id.leftWheelControl );
-        leftBG.setVisibility( View.INVISIBLE );
-        mLeftControl.setVisibility( View.INVISIBLE );
-
         TextView tv = (TextView)findViewById( R.id.connectLabel );
         tv.setText( "NOT CONNECTED :(" );
+
+        Button up = (Button)findViewById( R.id.up_button );
+        Button left = (Button)findViewById( R.id.left_button );
+        Button right = (Button)findViewById( R.id.right_button );
+        Button down = (Button)findViewById( R.id.down_button );
+
+        up.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                if (mConnected && !mMoving) {
+                    if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+                       // mMoving = true;
+                        mConnectedThread.write(getWheelBytes(1));
+                    } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
+                        mMoving = false;
+                        mConnectedThread.write(getWheelBytes(0));
+                    }
+                    return true;
+                }
+                return false;
+            }
+        });
+
+        left.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                if (mConnected && !mMoving) {
+                    if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+                        //mMoving = true;
+                        mConnectedThread.write(getWheelBytes(2));
+                    } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
+                        mMoving = false;
+                        mConnectedThread.write(getWheelBytes(0));
+                    }
+                    return true;
+                }
+                return false;
+            }
+        });
+
+        right.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                if (mConnected && !mMoving) {
+                    if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+                        //mMoving = true;
+                        mConnectedThread.write(getWheelBytes(3));
+                    } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
+                        mMoving = false;
+                        mConnectedThread.write(getWheelBytes(0));
+                    }
+                    return true;
+                }
+                return false;
+            }
+        });
+
+        down.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                if (mConnected && !mMoving) {
+                    if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+                        //mMoving = true;
+                        mConnectedThread.write(getWheelBytes(4));
+                    } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
+                        mMoving = false;
+                        mConnectedThread.write(getWheelBytes(0));
+                    }
+                    return true;
+                }
+                return false;
+            }
+        });
 
         /*mAcceptHandler = new Handler()
         {
@@ -118,21 +189,13 @@ public class MainActivity extends Activity {
         }
     }
 
-    private byte[] getWheelBytes( int aLeft, int aRight )
+    private byte[] getWheelBytes( int aInt )
     {
         return new byte[] {
-                (byte)( aLeft >>> 56 ),
-                (byte)( aLeft >>> 48 ),
-                (byte)( aLeft >>> 40 ),
-                (byte)( aLeft >>> 32 ),
-                (byte)( aRight >>> 24 ),
-                (byte)( aRight >>> 16 ),
-                (byte)( aRight >>> 8 ),
-                (byte)aRight };
-    }
-
-    protected void constructController()
-    {
+                (byte)( aInt >>> 24 ),
+                (byte)( aInt >>> 16 ),
+                (byte)( aInt >>> 8 ),
+                (byte)aInt };
     }
 
     /*private class AcceptThread extends Thread {
@@ -240,11 +303,7 @@ public class MainActivity extends Activity {
                     devAddr.setText( mRobot.getAddress() );
                     connected.setText( "Connected:");
 
-                    byte[] bytes;
-                    bytes = getWheelBytes( 90, 90 );
-                    mConnectedThread.write( bytes );
                     mConnected = true;
-                    constructController();
                 }
             }
         };

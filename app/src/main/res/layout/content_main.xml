@@ -55,39 +55,34 @@
         android:id="@+id/read" />
 
     <Button
-        android:text="Button"
+        android:text="Up"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/read"
         android:layout_toEndOf="@+id/addressLabel"
         android:layout_marginTop="44dp"
-        android:id="@+id/button2" />
+        android:id="@+id/up_button" />
 
     <Button
-        android:text="Button"
+        android:text="left"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="27dp"
-        android:id="@+id/button3"
-        android:layout_above="@+id/button"
-        android:layout_toEndOf="@+id/read"
-        android:layout_marginBottom="45dp" />
+        android:layout_marginStart="100dp"
+        android:id="@+id/left_button"
+        android:layout_marginBottom="60dp" />
 
-    <ToggleButton
-        android:text="ToggleButton"
+    <Button
+        android:text="Right"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/toggleButton"
-        android:layout_below="@+id/button"
-        android:layout_alignStart="@+id/button3"
+        android:id="@+id/right_button"
         android:layout_marginStart="10dp" />
 
     <Button
-        android:text="Button"
+        android:text="Down"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/button"
-        android:layout_above="@+id/button2"
+        android:id="@+id/down_button"
         android:layout_toStartOf="@+id/read"
         android:layout_marginBottom="55dp" />
 
