@@ -44,4 +44,13 @@
         android:text="None :("
         android:layout_alignParentTop="true"
         android:layout_toEndOf="@+id/connectLabel" />
+
+    <TextView
+        android:text="TextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/deviceAddress"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="179dp"
+        android:id="@+id/read" />
 </RelativeLayout>

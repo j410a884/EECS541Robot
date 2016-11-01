@@ -2,6 +2,7 @@ package com.robot.eecs541.eecs541robot;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
 import android.os.Bundle;
@@ -16,31 +17,24 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 
+import org.w3c.dom.Text;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.UUID;
 
+import static android.app.Activity.RESULT_OK;
+import static android.provider.Settings.NameValueTable.NAME;
+
 public class MainActivity extends AppCompatActivity {
 
     protected static final int GET_BT_CONFIG = 1;
     protected static final int CONNECTION_STARTED = 789;
-    private Handler mHandler = new Handler()
-    {
-        protected void handleEmptyMessage( int what )
-        {
-            if( what == CONNECTION_STARTED )
-            {
-                byte[] bytes;
-                String test = "idk";
-                bytes = test.getBytes();
-                mConnectedThread.write( bytes );
-            }
-        }
-    };
     protected BluetoothDevice mDevice;
     private static final UUID MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb");
-    private ConnectThread mConnectThread;
+//    private ConnectThread mConnectThread;
+    private AcceptThread mAcceptThread;
     private ConnectedThread mConnectedThread;
     private BluetoothAdapter mBluetoothAdapter;
     private BluetoothDevice mRobot;
@@ -55,6 +49,8 @@ public class MainActivity extends AppCompatActivity {
         startActivityForResult( bt, GET_BT_CONFIG );
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
+        TextView tv = (TextView)findViewById( R.id.connectLabel );
+        tv.setText( "NOT CONNECTED :(" );
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -93,18 +89,61 @@ public class MainActivity extends AppCompatActivity {
         {
             if(resultCode == RESULT_OK)
             {
-                TextView devName = (TextView)findViewById( R.id.deviceName );
-                TextView devAddr = (TextView)findViewById( R.id.deviceAddress );
-                devName.setText( data.getStringExtra("name") );
-                devAddr.setText( data.getStringExtra("addr") );
                 mRobot = mBluetoothAdapter.getRemoteDevice( data.getStringExtra("addr") );
-                mConnectThread = new ConnectThread( mRobot );
-                mConnectThread.start();
+                //mConnectThread = new ConnectThread( mRobot );
+                //mConnectThread.start();
+                mAcceptThread = new AcceptThread();
+                mAcceptThread.start();
             }
         }
     }
 
-    private class ConnectThread extends Thread {
+    private class AcceptThread extends Thread {
+        private final BluetoothServerSocket mmServerSocket;
+
+        public AcceptThread() {
+            // Use a temporary object that is later assigned to mmServerSocket,
+            // because mmServerSocket is final
+            BluetoothServerSocket tmp = null;
+            try {
+                // MY_UUID is the app's UUID string, also used by the client code
+                tmp = mBluetoothAdapter.listenUsingRfcommWithServiceRecord(NAME, MY_UUID);
+            } catch (IOException e) { }
+            mmServerSocket = tmp;
+        }
+
+        public void run() {
+            BluetoothSocket socket = null;
+            // Keep listening until exception occurs or a socket is returned
+            while (true) {
+                try {
+                    socket = mmServerSocket.accept();
+                } catch (IOException e) {
+                    break;
+                }
+                // If a connection was accepted
+                if (socket != null) {
+                    // Do work to manage the connection (in a separate thread)
+                    mConnectedThread = new ConnectedThread( socket );
+                    mConnectedThread.start();
+                    try {
+                        mmServerSocket.close();
+                    } catch (IOException e) { }
+                    break;
+                }
+            }
+        }
+
+
+        /** Will cancel the listening socket, and cause the thread to finish */
+        public void cancel() {
+            try {
+                mmServerSocket.close();
+            } catch (IOException e) { }
+        }
+    }
+
+    /*private class ConnectThread extends Thread {
         private final BluetoothSocket mmSocket;
         private final BluetoothDevice mmDevice;
 
@@ -145,17 +184,35 @@ public class MainActivity extends AppCompatActivity {
         }
 
         /** Will cancel an in-progress connection, and close the socket */
-        public void cancel() {
+        /*public void cancel() {
             try {
                 mmSocket.close();
             } catch (IOException e) { }
         }
 
-    }
+        private final Handler mHandler = new Handler()
+        {
+            public void handleMessage( Message msg )
+            {
+                if( msg.what == CONNECTION_STARTED )
+                {
+                    TextView devName = (TextView)findViewById( R.id.deviceName );
+                    TextView devAddr = (TextView)findViewById( R.id.deviceAddress );
+                    devName.setText( mRobot.getName() );
+                    devAddr.setText( mRobot.getAddress() );
+                    byte[] bytes;
+                    String test = "idk";
+                    bytes = test.getBytes();
+                    mConnectedThread.write( bytes );
+                }
+            }
+        };
+    }*/
     private class ConnectedThread extends Thread {
         private final BluetoothSocket mmSocket;
         private final InputStream mmInStream;
         private final OutputStream mmOutStream;
+        int MESSAGE_READ = 987;
 
         public ConnectedThread(BluetoothSocket socket) {
             mmSocket = socket;
@@ -179,7 +236,7 @@ public class MainActivity extends AppCompatActivity {
             int bytes; // bytes returned from read()
 
             // Keep listening to the InputStream until an exception occurs
-                /*while (true) {
+                while (true) {
                     try {
                         // Read from the InputStream
                         bytes = mmInStream.read(buffer);
@@ -189,7 +246,7 @@ public class MainActivity extends AppCompatActivity {
                     } catch (IOException e) {
                         break;
                     }
-                }*/
+                }
         }
 
         /* Call this from the main activity to send data to the remote device */
@@ -207,5 +264,17 @@ public class MainActivity extends AppCompatActivity {
             } catch (IOException e) {
             }
         }
+
+        private final Handler mHandler = new Handler()
+        {
+            public void handleMessage( Message msg )
+            {
+                if( msg.what == CONNECTION_STARTED )
+                {
+                    TextView readData = (TextView)findViewById( R.id.read );
+                    readData.setText( msg.toString() );
+                }
+            }
+        };
     }
 }
