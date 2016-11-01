@@ -66,7 +66,7 @@ public class MainActivity extends Activity {
         Button left = (Button)findViewById( R.id.left_button );
         Button right = (Button)findViewById( R.id.right_button );
         Button down = (Button)findViewById( R.id.down_button );
-        Button stop = (Button)findViewById( R.id.stop_button );
+        //Button stop = (Button)findViewById( R.id.stop_button );
 
         up.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -136,7 +136,7 @@ public class MainActivity extends Activity {
             }
         });
 
-        stop.setOnTouchListener(new View.OnTouchListener() {
+      /*  stop.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
                 if (mConnected && !mMoving) {
@@ -151,7 +151,7 @@ public class MainActivity extends Activity {
                 }
                 return false;
             }
-        });
+        });*/
 
         /*mAcceptHandler = new Handler()
         {
