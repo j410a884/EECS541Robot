@@ -54,22 +54,59 @@
         android:layout_marginTop="179dp"
         android:id="@+id/read" />
 
-    <ImageView
-        app:srcCompat="@android:drawable/screen_background_dark"
-        android:id="@+id/leftBound"
-        android:layout_height="300dp"
-        android:layout_width="75dp"
-        android:layout_centerVertical="true"
-        android:layout_alignEnd="@+id/deviceName"
-        android:layout_marginEnd="23dp" />
+    <Button
+        android:text="Button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/read"
+        android:layout_toEndOf="@+id/addressLabel"
+        android:layout_marginTop="44dp"
+        android:id="@+id/button2" />
 
-    <ImageView
-        app:srcCompat="@android:drawable/presence_busy"
-        android:layout_marginBottom="11dp"
-        android:id="@+id/leftWheelControl"
-        android:layout_height="36dp"
-        android:layout_alignBottom="@+id/leftBound"
-        android:layout_alignEnd="@+id/leftBound"
-        android:adjustViewBounds="false"
-        android:layout_width="75dp" />
+    <Button
+        android:text="Button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="27dp"
+        android:id="@+id/button3"
+        android:layout_above="@+id/button"
+        android:layout_toEndOf="@+id/read"
+        android:layout_marginBottom="45dp" />
+
+    <ToggleButton
+        android:text="ToggleButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/toggleButton"
+        android:layout_below="@+id/button"
+        android:layout_alignStart="@+id/button3"
+        android:layout_marginStart="10dp" />
+
+    <Button
+        android:text="Button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/button"
+        android:layout_above="@+id/button2"
+        android:layout_toStartOf="@+id/read"
+        android:layout_marginBottom="55dp" />
+
+    <!--<ImageView-->
+        <!--app:srcCompat="@android:drawable/screen_background_dark"-->
+        <!--android:id="@+id/leftBound"-->
+        <!--android:layout_height="300dp"-->
+        <!--android:layout_width="75dp"-->
+        <!--android:layout_centerVertical="true"-->
+        <!--android:layout_alignEnd="@+id/deviceName"-->
+        <!--android:layout_marginEnd="23dp" />-->
+
+    <!--<ImageView-->
+        <!--app:srcCompat="@android:drawable/presence_busy"-->
+        <!--android:layout_marginBottom="11dp"-->
+        <!--android:id="@+id/leftWheelControl"-->
+        <!--android:layout_height="36dp"-->
+        <!--android:layout_alignBottom="@+id/leftBound"-->
+        <!--android:layout_alignEnd="@+id/leftBound"-->
+        <!--android:adjustViewBounds="false"-->
+        <!--android:layout_width="75dp" />-->
 </RelativeLayout>
