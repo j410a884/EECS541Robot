@@ -4,6 +4,8 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
+import android.content.ClipData;
+import android.content.ClipDescription;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -12,9 +14,12 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
+import android.view.DragEvent;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import org.w3c.dom.Text;
@@ -22,6 +27,7 @@ import org.w3c.dom.Text;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.ByteBuffer;
 import java.util.UUID;
 
 import static android.app.Activity.RESULT_OK;
@@ -33,12 +39,14 @@ public class MainActivity extends AppCompatActivity {
     protected static final int CONNECTION_STARTED = 789;
     protected BluetoothDevice mDevice;
     private static final UUID MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb");
-//    private ConnectThread mConnectThread;
-    private AcceptThread mAcceptThread;
+    private ConnectThread mConnectThread;
+//    private AcceptThread mAcceptThread;
     private ConnectedThread mConnectedThread;
     private BluetoothAdapter mBluetoothAdapter;
     private BluetoothDevice mRobot;
-    int MESSAGE_READ = 987;
+  //  int MESSAGE_READ = 987;
+    boolean connected = false;
+    private ImageView mLeftControl;
 
     private Handler mAcceptHandler;
 
@@ -48,15 +56,19 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        //Intent bt = new Intent( getApplicationContext(), BluetoothActivity.class );
-        //startActivityForResult( bt, GET_BT_CONFIG );
+        Intent bt = new Intent( getApplicationContext(), BluetoothActivity.class );
+        startActivityForResult( bt, GET_BT_CONFIG );
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
+        ImageView leftBG = (ImageView)findViewById( R.id.leftBound );
+        mLeftControl = (ImageView)findViewById( R.id.leftWheelControl );
+        leftBG.setVisibility( View.INVISIBLE );
+        mLeftControl.setVisibility( View.INVISIBLE );
 
         TextView tv = (TextView)findViewById( R.id.connectLabel );
         tv.setText( "NOT CONNECTED :(" );
 
-        mAcceptHandler = new Handler()
+        /*mAcceptHandler = new Handler()
         {
             public void handleMessage( Message msg )
             {
@@ -66,10 +78,10 @@ public class MainActivity extends AppCompatActivity {
                     readData.setText( msg.toString() );
                 }
             }
-        };
+        };*/
 
-        mAcceptThread = new AcceptThread();
-        mAcceptThread.start();
+        //mAcceptThread = new AcceptThread();
+        //mAcceptThread.start();
 
     }
 
@@ -102,15 +114,80 @@ public class MainActivity extends AppCompatActivity {
             if(resultCode == RESULT_OK)
             {
                 mRobot = mBluetoothAdapter.getRemoteDevice( data.getStringExtra("addr") );
-               // mConnectThread = new ConnectThread( mRobot );
-               // mConnectThread.start();
+                mConnectThread = new ConnectThread( mRobot );
+                mConnectThread.start();
                 //mAcceptThread = new AcceptThread();
                 //mAcceptThread.start();
             }
         }
     }
 
-    private class AcceptThread extends Thread {
+    protected void constructController()
+    {
+        ImageView leftBG = (ImageView)findViewById( R.id.leftBound );
+        leftBG.setVisibility(View.VISIBLE);
+        mLeftControl.setVisibility( View.VISIBLE );
+        final float yBound = leftBG.getY();
+        final float origLY = mLeftControl.getY();
+        mLeftControl.setOnLongClickListener( new View.OnLongClickListener()
+        {
+            @Override
+            public boolean onLongClick(View v) {
+                ClipData.Item item = new ClipData.Item((CharSequence)v.getTag());
+                String[] mimeTypes = {ClipDescription.MIMETYPE_TEXT_PLAIN};
+
+                ClipData dragData = new ClipData(v.getTag().toString(),mimeTypes, item);
+                View.DragShadowBuilder myShadow = new View.DragShadowBuilder( mLeftControl );
+
+                v.startDrag(dragData,myShadow,null,0);
+                return true;
+            }
+        });
+
+        mLeftControl.setOnDragListener( new View.OnDragListener()
+        {
+            @Override
+            public boolean onDrag(View v, DragEvent event) {
+                float lY = mLeftControl.getY();
+                switch(event.getAction())
+                {
+                    case DragEvent.ACTION_DRAG_STARTED:
+                        lY = mLeftControl.getY();
+                        mConnectedThread.write(ByteBuffer.allocate(4).putFloat(lY).array() );
+                        break;
+
+                    case DragEvent.ACTION_DRAG_ENTERED:
+                        break;
+
+                    case DragEvent.ACTION_DRAG_EXITED :
+                        mLeftControl.setY( origLY );
+                        byte[] out;
+
+                        mConnectedThread.write(ByteBuffer.allocate(4).putFloat(lY).array() );
+                        break;
+
+                    case DragEvent.ACTION_DRAG_LOCATION:
+                        if( lY < yBound ) {
+                            mLeftControl.setY(lY);
+                            mConnectedThread.write(ByteBuffer.allocate(4).putFloat(lY).array() );
+                        }
+                        break;
+
+                    case DragEvent.ACTION_DRAG_ENDED   :
+                        mLeftControl.setY( origLY );
+                        break;
+
+                    case DragEvent.ACTION_DROP:
+                        // Do nothing
+                        break;
+                    default: break;
+                }
+                return true;
+            }
+        });
+    }
+
+    /*private class AcceptThread extends Thread {
         private final BluetoothServerSocket mmServerSocket;
 
         public AcceptThread() {
@@ -147,15 +224,15 @@ public class MainActivity extends AppCompatActivity {
         }
 
 
-        /** Will cancel the listening socket, and cause the thread to finish */
+        // Will cancel the listening socket, and cause the thread to finish
         public void cancel() {
             try {
                 mmServerSocket.close();
             } catch (IOException e) { }
         }
-    }
+    }*/
 
- /*   private class ConnectThread extends Thread {
+    private class ConnectThread extends Thread {
         private final BluetoothSocket mmSocket;
         private final BluetoothDevice mmDevice;
 
@@ -216,10 +293,12 @@ public class MainActivity extends AppCompatActivity {
                     String test = "idk";
                     bytes = test.getBytes();
                     mConnectedThread.write( bytes );
+                    connected = true;
+                    constructController();
                 }
             }
         };
-    }*/
+    }
 
     private class ConnectedThread extends Thread {
         private final BluetoothSocket mmSocket;
@@ -248,7 +327,7 @@ public class MainActivity extends AppCompatActivity {
             int bytes; // bytes returned from read()
 
             // Keep listening to the InputStream until an exception occurs
-                while (true) {
+               /* while (true) {
                     try {
                         // Read from the InputStream
                         bytes = mmInStream.read(buffer);
@@ -258,7 +337,7 @@ public class MainActivity extends AppCompatActivity {
                     } catch (IOException e) {
                         break;
                     }
-                }
+                }*/
         }
 
         /* Call this from the main activity to send data to the remote device */

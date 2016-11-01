@@ -53,4 +53,23 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="179dp"
         android:id="@+id/read" />
+
+    <ImageView
+        app:srcCompat="@android:drawable/screen_background_dark"
+        android:id="@+id/leftBound"
+        android:layout_height="300dp"
+        android:layout_width="75dp"
+        android:layout_centerVertical="true"
+        android:layout_alignEnd="@+id/deviceName"
+        android:layout_marginEnd="23dp" />
+
+    <ImageView
+        app:srcCompat="@android:drawable/presence_busy"
+        android:layout_marginBottom="11dp"
+        android:id="@+id/leftWheelControl"
+        android:layout_height="36dp"
+        android:layout_alignBottom="@+id/leftBound"
+        android:layout_alignEnd="@+id/leftBound"
+        android:adjustViewBounds="false"
+        android:layout_width="75dp" />
 </RelativeLayout>
