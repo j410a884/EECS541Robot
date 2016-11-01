@@ -66,6 +66,7 @@ public class MainActivity extends Activity {
         Button left = (Button)findViewById( R.id.left_button );
         Button right = (Button)findViewById( R.id.right_button );
         Button down = (Button)findViewById( R.id.down_button );
+        Button stop = (Button)findViewById( R.id.stop_button );
 
         up.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -125,6 +126,23 @@ public class MainActivity extends Activity {
                     if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
                         //mMoving = true;
                         mConnectedThread.write(getWheelBytes(4));
+                    } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
+                        mMoving = false;
+                        mConnectedThread.write(getWheelBytes(0));
+                    }
+                    return true;
+                }
+                return false;
+            }
+        });
+
+        stop.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                if (mConnected && !mMoving) {
+                    if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+                        //mMoving = true;
+                        mConnectedThread.write(getWheelBytes(0));
                     } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
                         mMoving = false;
                         mConnectedThread.write(getWheelBytes(0));
@@ -301,7 +319,7 @@ public class MainActivity extends Activity {
                     TextView connected = (TextView)findViewById( R.id.connectLabel );
                     devName.setText( mRobot.getName() );
                     devAddr.setText( mRobot.getAddress() );
-                    connected.setText( "Connected:");
+                    connected.setText("Connected:");
 
                     mConnected = true;
                 }
