@@ -43,6 +43,7 @@ public class MainActivity extends Activity {
   //  int MESSAGE_READ = 987;
     boolean mConnected = false;
     private ImageView mLeftControl;
+    private enum { FORWARD; LEFT; RIGHT; BACKWARD; }
 
     private Handler mAcceptHandler;
 
@@ -132,67 +133,6 @@ public class MainActivity extends Activity {
 
     protected void constructController()
     {
-        ImageView leftBG = (ImageView)findViewById( R.id.leftBound );
-        leftBG.setVisibility(View.VISIBLE);
-        mLeftControl.setVisibility( View.VISIBLE );
-        final float yBound = leftBG.getY();
-        final float origLY = mLeftControl.getY();
-        mLeftControl.setOnLongClickListener( new View.OnLongClickListener()
-        {
-            @Override
-            public boolean onLongClick(View v) {
-                ClipData.Item item = new ClipData.Item((CharSequence)v.getTag());
-                String[] mimeTypes = {ClipDescription.MIMETYPE_TEXT_PLAIN};
-
-                ClipData dragData = new ClipData(v.getTag().toString(),mimeTypes, item);
-                View.DragShadowBuilder myShadow = new View.DragShadowBuilder( mLeftControl );
-
-                v.startDrag(dragData,myShadow,null,0);
-                return true;
-            }
-        });
-
-        mLeftControl.setOnDragListener( new View.OnDragListener()
-        {
-            @Override
-            public boolean onDrag(View v, DragEvent event) {
-                float lY = mLeftControl.getY();
-                switch(event.getAction())
-                {
-                    case DragEvent.ACTION_DRAG_STARTED:
-                        lY = mLeftControl.getY();
-                        mConnectedThread.write(ByteBuffer.allocate(4).putFloat(lY).array() );
-                        break;
-
-                    case DragEvent.ACTION_DRAG_ENTERED:
-                        break;
-
-                    case DragEvent.ACTION_DRAG_EXITED :
-                        mLeftControl.setY( origLY );
-                        byte[] out;
-
-                        mConnectedThread.write(ByteBuffer.allocate(4).putFloat(lY).array() );
-                        break;
-
-                    case DragEvent.ACTION_DRAG_LOCATION:
-                        if( lY < yBound ) {
-                            mLeftControl.setY(lY);
-                            mConnectedThread.write(ByteBuffer.allocate(4).putFloat(lY).array() );
-                        }
-                        break;
-
-                    case DragEvent.ACTION_DRAG_ENDED   :
-                        mLeftControl.setY( origLY );
-                        break;
-
-                    case DragEvent.ACTION_DROP:
-                        // Do nothing
-                        break;
-                    default: break;
-                }
-                return true;
-            }
-        });
     }
 
     /*private class AcceptThread extends Thread {
