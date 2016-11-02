@@ -55,40 +55,12 @@
         android:id="@+id/read" />
 
     <Button
-        android:text="STOP"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/up_button"
-        android:id="@+id/stop_button"
-        android:layout_alignStart="@+id/up_button" />
-
-    <Button
         android:text="Up"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/up_button"
-        android:layout_above="@+id/right_button"
-        android:layout_alignStart="@+id/down_button" />
-
-    <Button
-        android:text="Down"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/down_button"
-
-        android:layout_marginTop="13dp"
-        android:layout_below="@+id/read"
-        android:layout_toEndOf="@+id/deviceAddress" />
-
-    <Button
-        android:text="left"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/left_button"
-
-        android:layout_alignBaseline="@+id/right_button"
-        android:layout_alignBottom="@+id/right_button"
-        android:layout_alignEnd="@+id/deviceName" />
+        android:layout_below="@+id/deviceAddress"
+        android:layout_alignStart="@+id/stop_button" />
 
     <Button
         android:text="Right"
@@ -96,9 +68,38 @@
         android:layout_height="wrap_content"
         android:id="@+id/right_button"
 
-        android:layout_above="@+id/down_button"
-        android:layout_alignParentEnd="true"
-        android:layout_marginEnd="16dp" />
+        android:layout_alignBaseline="@+id/read"
+        android:layout_alignBottom="@+id/read"
+        android:layout_alignParentEnd="true" />
+
+    <Button
+        android:text="Down"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/down_button"
+
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="110dp" />
+
+    <Button
+        android:text="STOP"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/stop_button"
+
+        android:layout_alignTop="@+id/right_button"
+        android:layout_alignStart="@+id/down_button" />
+
+    <Button
+        android:text="left"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/left_button"
+
+        android:layout_alignBaseline="@+id/stop_button"
+        android:layout_alignBottom="@+id/stop_button"
+        android:layout_alignParentStart="true" />
 
     <!--<ImageView-->
         <!--app:srcCompat="@android:drawable/screen_background_dark"-->
